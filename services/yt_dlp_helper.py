@@ -9,7 +9,7 @@ def is_valid_youtube_url(url):
     parsed = urlparse(url)
     return 'youtube.com' in parsed.netloc or 'youtu.be' in parsed.netloc
 
-def download_youtube(url, user_id, timestamp, audio_only=False):
+def download_youtube(url, user_id, timestamp, audio_only=False, progress_hook=None):
     if not is_valid_youtube_url(url):
         raise ValueError('Invalid YouTube URL')
     ext = 'mp3' if audio_only else 'mp4'
@@ -30,7 +30,8 @@ def download_youtube(url, user_id, timestamp, audio_only=False):
             'preferredcodec': 'mp3',
             'preferredquality': '192',
         }]
+    if progress_hook:
+        ydl_opts['progress_hooks'] = [progress_hook]
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
-    # For large files, you may want to serve from a web server; here we just return the local path
     return {'filepath': filepath, 'webpath': filepath}
