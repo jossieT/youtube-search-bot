@@ -63,4 +63,11 @@ async def handle_download(message: types.Message):
         else:
             await status_msg.edit_text('✅ Here is your video 🎬')
             await message.reply_video(f, caption='✅ Here is your video 🎬')
-    os.remove(result['filepath'])
+    # Clean up all files in downloads folder
+    try:
+        for file in os.listdir(DOWNLOADS_DIR):
+            file_path = os.path.join(DOWNLOADS_DIR, file)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+    except Exception:
+        pass
