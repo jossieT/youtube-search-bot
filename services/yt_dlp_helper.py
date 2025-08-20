@@ -17,19 +17,27 @@ def download_youtube(url, user_id, timestamp, audio_only=False, progress_hook=No
     os.makedirs(out_dir, exist_ok=True)
     filename = f"{user_id}_{timestamp}.{ext}"
     filepath = os.path.join(out_dir, filename)
-    ydl_opts = {
-        'outtmpl': filepath,
-        'format': 'bestaudio/best' if audio_only else 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4',
-        'merge_output_format': ext,
-        'quiet': True,
-        'noplaylist': True,
-    }
     if audio_only:
-        ydl_opts['postprocessors'] = [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }]
+        ydl_opts = {
+            'outtmpl': filepath,
+            'format': 'bestaudio/best',
+            'merge_output_format': ext,
+            'quiet': True,
+            'noplaylist': True,
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }]
+        }
+    else:
+        ydl_opts = {
+            'outtmpl': filepath,
+            'format': 'bestvideo+bestaudio/best',
+            'merge_output_format': ext,
+            'quiet': True,
+            'noplaylist': True,
+        }
     if progress_hook:
         ydl_opts['progress_hooks'] = [progress_hook]
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
